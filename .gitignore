@@ -1,0 +1,29 @@
+# ==================
+# FRONTEND (React)
+# ==================
+nailsapp/node_modules/
+nailsapp/dist/
+nailsapp/.env
+nailsapp/.env.local
+nailsapp/.env.production
+nailsapp/.env.development
+nailsapp/coverage/
+
+# ==================
+# BACKEND (ASP.NET)
+# ==================
+nailsApi/**/bin/
+nailsApi/**/obj/
+nailsApi/**/*.user
+nailsApi/**/appsettings.Development.json
+nailsApi/**/.vs/
+nailsApi/**/*.db
+nailsApi/**/*.db-shm
+nailsApi/**/*.db-wal
+
+# ==================
+# GENERAL
+# ==================
+.DS_Store
+Thumbs.db
+*.log
