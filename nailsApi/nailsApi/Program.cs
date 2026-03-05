@@ -2,7 +2,9 @@ using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using NailsApi.Application.DTOs.Citas;
 using NailsApi.Application.DTOs.Clientes;
+using NailsApi.Application.DTOs.Servicios;
 using NailsApi.Application.Interfaces;
 using NailsApi.Application.Services;
 using NailsApi.Application.Validators;
@@ -31,6 +33,16 @@ builder.Services.AddScoped<IClienteService, ClienteService>();
 
 // FluentValidation
 builder.Services.AddScoped<IValidator<ClienteRequestDto>, ClienteValidator>();
+
+// Servicios
+builder.Services.AddScoped<IServicioRepository, ServicioRepository>();
+builder.Services.AddScoped<IServicioService, ServicioService>();
+builder.Services.AddScoped<IValidator<ServicioRequestDto>, ServicioValidator>();
+
+// Citas
+builder.Services.AddScoped<ICitaRepository, CitaRepository>();
+builder.Services.AddScoped<ICitaService, CitaService>();
+builder.Services.AddScoped<IValidator<CitaRequestDto>, CitaValidator>();
 
 // Mapster
 var config = TypeAdapterConfig.GlobalSettings;

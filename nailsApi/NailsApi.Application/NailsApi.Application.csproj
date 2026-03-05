@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Citas\" />
-    <Folder Include="DTOs\Servicios\" />
-    <Folder Include="Mappings\" />
-    <Folder Include="Validators\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Mapster" Version="7.4.0" />
   </ItemGroup>

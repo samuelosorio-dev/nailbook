@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ClientesPage from "./pages/ClientesPage";
+import ServiciosPage from "./pages/ServiciosPage";
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Inicio", icon: "✦" },
@@ -15,6 +16,8 @@ function App() {
     switch (active) {
       case "clientes":
         return <ClientesPage />;
+      case "servicios":
+        return <ServiciosPage />;
       default:
         return (
           <div className="flex items-center justify-center min-h-screen">
@@ -26,7 +29,6 @@ function App() {
 
   return (
     <div style={{ fontFamily: "'Lato', sans-serif" }}>
-      {/* Página activa */}
       {renderPage()}
 
       {/* Navegación inferior */}
