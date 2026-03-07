@@ -6,6 +6,7 @@ import ServicioForm from "../components/servicios/ServicioForm";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { type ServicioResponse, TipoServicio, type ServicioRequest } from "../models/servicio.model";
+import AppHeader from "../components/ui/AppHeader";
 
 const ServiciosPage = () => {
     const { servicios, loading, error, crearServicio, editarServicio } = useServicios();
@@ -48,6 +49,7 @@ const ServiciosPage = () => {
 
             <div className="max-w-md mx-auto">
                 {/* Header */}
+                <AppHeader/>
                 <div className="flex justify-between items-center mb-6">
                     <h1
                         className="text-2xl font-bold text-rose-900"

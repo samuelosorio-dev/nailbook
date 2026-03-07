@@ -37,8 +37,8 @@ namespace NailsApi.Infrastructure.Repositories
         public async Task<List<Cita>> GetAllAsync(PaginacionDto paginacion, EstadoCita? estado = null)
         {
             return await GetCitasQuery(estado)
-                .OrderByDescending(c => c.Fecha)
-                .ThenByDescending(c => c.HoraInicio)
+                .OrderBy(c => c.Fecha)
+                .ThenBy(c => c.HoraInicio)
                 .Paginar(paginacion)
                 .ToListAsync();
         }

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import ClientesPage from "./pages/ClientesPage";
 import ServiciosPage from "./pages/ServiciosPage";
+import CitasPage from "./pages/CitasPage";
+import { ClipboardClock, House, LayoutGrid, Users } from "lucide-react";
 
 const NAV_ITEMS = [
-  { id: "dashboard", label: "Inicio", icon: "✦" },
-  { id: "citas", label: "Citas", icon: "◈" },
-  { id: "clientes", label: "Clientas", icon: "◉" },
-  { id: "servicios", label: "Servicios", icon: "◆" },
+  { id: "dashboard", label: "Inicio", icon: <House/>},
+  { id: "citas", label: "Citas", icon: <ClipboardClock/> },
+  { id: "clientes", label: "Clientas", icon: <Users/> },
+  { id: "servicios", label: "Servicios", icon: <LayoutGrid/> },
 ];
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
         return <ClientesPage />;
       case "servicios":
         return <ServiciosPage />;
+      case "citas":
+        return <CitasPage />
       default:
         return (
           <div className="flex items-center justify-center min-h-screen">

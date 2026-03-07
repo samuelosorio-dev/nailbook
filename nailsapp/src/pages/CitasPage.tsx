@@ -1,64 +1,64 @@
-import { useEffect, useState } from "react";
-import useClientes from "../hooks/useClientes";
-import ClienteList from "../components/clientes/ClienteList";
-import ClienteForm from "../components/clientes/ClienteForm";
-import Modal from "../components/ui/Modal";
+import { useState } from "react";
+import CitaForm from "../components/citas/CitaForm";
+import CitaList from "../components/citas/CitaList";
 import Button from "../components/ui/Button";
-import type { ClienteRequest, ClienteResponse } from "../models/cliente.model";
+import Modal from "../components/ui/Modal";
+import useCitas from "../hooks/useCitas";
+import useServicios from "../hooks/useServicios";
+import { EstadoCita, type CitaResponse, type CitaRequest } from "../models/cita.model";
 import AppHeader from "../components/ui/AppHeader";
 
+const filtros = [
+    { label: "Todas", valor: undefined },
+    { label: "Programada", valor: EstadoCita.Programada },
+    { label: "Finalizada", valor: EstadoCita.Finalizada },
+    { label: "Cancelada", valor: EstadoCita.Cancelada },
+];
 
-
-const ClientesPage = () => {
+const CitasPage = () => {
     const {
-        clientes,
-        totalRegistros,
+        citas,
         totalPaginas,
         paginaActual,
+        filtroEstado,
         loading,
         error,
-        cargarClientes,
-        buscarClientes,
-        crearCliente,
-        editarCliente
-    } = useClientes();
+        cargarCitas,
+        crearCita,
+        editarCita,
+        cambiarEstado,
+        cambiarFiltro,
+    } = useCitas();
 
-    const [search, setSearch] = useState("");
+    const { servicios } = useServicios();
+
     const [showModal, setShowModal] = useState(false);
-    const [clienteEditar, setClienteEditar] = useState<ClienteResponse | null>(null);
-    const [buscando, setBuscando] = useState(false);
+    const [citaEditar, setCitaEditar] = useState<CitaResponse | null>(null);
 
-    // Debounce
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (search.trim()) {
-                setBuscando(true);
-                buscarClientes(search);
-            } else {
-                setBuscando(false);
-                cargarClientes(1);
-            }
-        }, 1000);
-
-        return () => clearTimeout(timeout);
-    }, [search, cargarClientes, buscarClientes]);
-
-    const handleEdit = (cliente: ClienteResponse) => {
-        setClienteEditar(cliente);
+    const handleEdit = (cita: CitaResponse) => {
+        setCitaEditar(cita);
         setShowModal(true);
+    };
+
+    const handleCancelar = async (id: number) => {
+        await cambiarEstado(id, EstadoCita.Cancelada);
+    };
+
+    const handleFinalizar = async (id: number) => {
+        await cambiarEstado(id, EstadoCita.Finalizada);
     };
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setClienteEditar(null);
+        setCitaEditar(null);
     };
 
-    const handleSubmit = async (data: ClienteRequest) => {
+    const handleSubmit = async (data: CitaRequest) => {
         let success = false;
-        if (clienteEditar) {
-            success = await editarCliente(clienteEditar.id, data);
+        if (citaEditar) {
+            success = await editarCita(citaEditar.id, data);
         } else {
-            success = await crearCliente(data);
+            success = await crearCita(data);
         }
         if (success) handleCloseModal();
     };
@@ -83,37 +83,37 @@ const ClientesPage = () => {
                             className="text-2xl font-bold text-rose-900"
                             style={{ fontFamily: "'Georgia', serif" }}
                         >
-                            Clientas
+                            Citas
                         </h1>
-                        
-                            <p className="text-xs text-gray-400 mt-1">
-                                {search.trim() 
-                                    ? `${clientes.length} resultados para "${search}"`
-                                    : `${totalRegistros} clientas registradas`
-                                }
-                            </p>
-                        
+                       
                     </div>
                     <Button
-                        label="+ Nueva Clienta"
+                        label={"+ Nueva Cita"}
                         onClick={() => setShowModal(true)}
                     />
                 </div>
 
-                {/* Buscador */}
-                <div className="mb-6">
-                    <input
-                        value={search}
-                        onChange={(e) => {
-                                            setSearch(e.target.value);
-                                            if (!e.target.value.trim()) {
-                                                setBuscando(false);
-                                            }
-                                        }
-                                }
-                        placeholder="Buscar por nombre o teléfono..."
-                        className="w-full border border-rose-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-rose-300 bg-rose-50/30"
-                    />
+                {/* Filtros */}
+                <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+                    {filtros.map((filtro) => {
+                        const activo = filtroEstado === filtro.valor;
+                        return (
+                            <button
+                                key={filtro.label}
+                                onClick={() => cambiarFiltro(filtro.valor)}
+                                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
+                                    ${activo
+                                        ? "text-white"
+                                        : "border border-rose-100 text-gray-400 hover:bg-rose-50"
+                                    }`}
+                                style={activo ? {
+                                    background: "linear-gradient(135deg, #f43f5e, #a855f7)"
+                                } : {}}
+                            >
+                                {filtro.label}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Error */}
@@ -124,28 +124,29 @@ const ClientesPage = () => {
                 )}
 
                 {/* Lista */}
-                <ClienteList
-                    clientes={clientes}
+                <CitaList
+                    citas={citas}
                     onEdit={handleEdit}
+                    onCancelar={handleCancelar}
+                    onFinalizar={handleFinalizar}
                     loading={loading}
                 />
 
                 {/* Paginación */}
-                {!buscando && totalPaginas > 1 && (
+                {totalPaginas > 1 && (
                     <div className="flex items-center justify-center gap-3 mt-6">
                         <button
-                            onClick={() => cargarClientes(paginaActual - 1)}
+                            onClick={() => cargarCitas(paginaActual - 1, filtroEstado)}
                             disabled={paginaActual === 1 || loading}
                             className="w-9 h-9 rounded-full border border-rose-200 text-rose-400 hover:bg-rose-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             ←
                         </button>
-
                         <div className="flex gap-2">
                             {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(pagina => (
                                 <button
                                     key={pagina}
-                                    onClick={() => cargarClientes(pagina)}
+                                    onClick={() => cargarCitas(pagina, filtroEstado)}
                                     className={`w-9 h-9 rounded-full text-sm font-semibold transition-all
                                         ${paginaActual === pagina
                                             ? "text-white shadow-md"
@@ -159,9 +160,8 @@ const ClientesPage = () => {
                                 </button>
                             ))}
                         </div>
-
                         <button
-                            onClick={() => cargarClientes(paginaActual + 1)}
+                            onClick={() => cargarCitas(paginaActual + 1, filtroEstado)}
                             disabled={paginaActual === totalPaginas || loading}
                             className="w-9 h-9 rounded-full border border-rose-200 text-rose-400 hover:bg-rose-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
@@ -174,14 +174,15 @@ const ClientesPage = () => {
             {/* Modal */}
             {showModal && (
                 <Modal
-                    title={clienteEditar ? "Editar Clienta" : "Nueva Clienta"}
+                    title={citaEditar ? "Editar Cita" : "Nueva Cita"}
                     onClose={handleCloseModal}
                 >
-                    <ClienteForm
+                    <CitaForm
                         onSubmit={handleSubmit}
                         onCancel={handleCloseModal}
-                        clienteEditar={clienteEditar}
+                        citaEditar={citaEditar}
                         loading={loading}
+                        servicios={servicios}
                     />
                 </Modal>
             )}
@@ -189,4 +190,4 @@ const ClientesPage = () => {
     );
 };
 
-export default ClientesPage;
+export default CitasPage;
