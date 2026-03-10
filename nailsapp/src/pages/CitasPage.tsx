@@ -66,8 +66,13 @@ const CitasPage = () => {
     return (
         <div
             className="min-h-screen px-4 pt-8 pb-24"
-            style={{ background: "linear-gradient(160deg, #fff0f6 0%, #f5f3ff 50%, #fdf2f8 100%)" }}
+            
         >
+            {/* Solo el fondo con opacidad */}
+    <div
+        className="fixed inset-0 -z-10"
+        style={{ background: "linear-gradient(160deg, #fff0f6 0%, #f5f3ff 50%, #fdf2f8 100%)" }}
+    />
             {/* Blob decorativo */}
             <div
                 className="fixed top-0 right-0 w-96 h-96 rounded-full opacity-20 pointer-events-none"

@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { getCitas, createCita, updateCita, cambiarEstadoCita } from "../api/citasApi";
 import type { CitaResponse, CitaFiltros, CitaRequest } from "../models/cita.model";
+import useAlerta from "./useAlerta";
 
 const useCitas = () => {
+    const {mostrarAlerta}=useAlerta();
     const [citas, setCitas] = useState<CitaResponse[]>([]);
     const [totalRegistros, setTotalRegistros] = useState(0);
     const [totalPaginas, setTotalPaginas] = useState(0);
@@ -40,12 +42,13 @@ const useCitas = () => {
             await cargarCitas(1, filtroEstado);
             return true;
         } catch (e) {
-            setError("Error al crear la cita: "+e);
+            const mensaje = e instanceof Error ? e.message : "Algo salió mal";
+            mostrarAlerta(mensaje, "error");
             return false;
         } finally {
             setLoading(false);
         }
-    }, [cargarCitas, filtroEstado]);
+    }, [cargarCitas, filtroEstado,mostrarAlerta]);
 
     const editarCita = useCallback(async (id: number, data: CitaRequest): Promise<boolean> => {
         setLoading(true);
@@ -55,12 +58,13 @@ const useCitas = () => {
             await cargarCitas(paginaActual, filtroEstado);
             return true;
         } catch (e) {
-            setError("Error al editar la cita: "+e);
+            const mensaje = e instanceof Error ? e.message : "Algo salió mal";
+            mostrarAlerta(mensaje, "error");
             return false;
         } finally {
             setLoading(false);
         }
-    }, [cargarCitas, paginaActual, filtroEstado]);
+    }, [cargarCitas, paginaActual, filtroEstado,mostrarAlerta]);
 
     const cambiarEstado = useCallback(async (id: number, estado: number): Promise<boolean> => {
         setLoading(true);
@@ -70,12 +74,13 @@ const useCitas = () => {
             await cargarCitas(paginaActual, filtroEstado);
             return true;
         } catch (e) {
-            setError("Error al cambiar el estado: "+e);
+            const mensaje = e instanceof Error ? e.message : "Algo salió mal";
+            mostrarAlerta(mensaje, "error");
             return false;
         } finally {
             setLoading(false);
         }
-    }, [cargarCitas, paginaActual, filtroEstado]);
+    }, [cargarCitas, paginaActual, filtroEstado,mostrarAlerta]);
 
     const cambiarFiltro = useCallback((estado?: number) => {
         setFiltroEstado(estado);

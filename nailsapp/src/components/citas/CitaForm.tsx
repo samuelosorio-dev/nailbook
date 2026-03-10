@@ -64,15 +64,17 @@ const CitaForm = ({
             setResultadosClientes([]);
             return;
         }
+
+        setBuscandoCliente(true);
+
         const timeout = setTimeout(async () => {
-            setBuscandoCliente(true);
             try {
                 const resultados = await searchClientes(busquedaCliente);
                 setResultadosClientes(resultados);
             } finally {
                 setBuscandoCliente(false);
             }
-        }, 600);
+        }, 1000);
         return () => clearTimeout(timeout);
     }, [busquedaCliente, clienteNombre]);
 
@@ -180,10 +182,10 @@ const CitaForm = ({
                         placeholder="Buscar clienta..."
                         className="w-full border border-rose-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-rose-300 bg-rose-50/30"
                     />
-                    {buscandoCliente && (
+                    {buscandoCliente && busquedaCliente!="" && (
                         <p className="text-xs text-gray-400 px-1">Buscando...</p>
                     )}
-                    {resultadosClientes.length > 0 && (
+                    {resultadosClientes.length > 0 || busquedaCliente==="" || buscandoCliente || clienteId!==null ? (
                         <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
                             {resultadosClientes.map(cliente => (
                                 <button
@@ -227,7 +229,7 @@ const CitaForm = ({
                                 </button>
                             ))}
                         </div>
-                    )}
+                    ):<p className="text-xs text-rose-400 px-1">No hay clientes que coincidan con la búsqueda '{busquedaCliente}'</p>}
                     {errors.cliente && (
                         <p className="text-xs text-rose-400 px-1">{errors.cliente}</p>
                     )}
@@ -378,6 +380,7 @@ const CitaForm = ({
                         label="← Atrás"
                         variant="secondary"
                         onClick={() => setPaso(p => p - 1)}
+                        disabled={citaEditar !== null && paso === 2}
                         fullWidth
                     />
                 ) : (

@@ -22,14 +22,20 @@ namespace NailsApi.Infrastructure.Repositories
 
         private IQueryable<Cita> GetCitasQuery(EstadoCita? estado = null)
         {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+            var inicioMes = new DateOnly(hoy.Year, hoy.Month, 1);
+            var inicioMesSiguiente = inicioMes.AddMonths(1);
+
             var query = _context.Citas
                 .Include(c => c.Cliente)
                 .Include(c => c.CitaServicios)
-                    .ThenInclude(cs => cs.Servicio)
+                .ThenInclude(cs => cs.Servicio)
+                .Where(c => c.Fecha >= inicioMes && c.Fecha < inicioMesSiguiente)
                 .AsQueryable();
 
             if (estado.HasValue)
                 query = query.Where(c => c.Estado == estado.Value);
+
 
             return query;
         }

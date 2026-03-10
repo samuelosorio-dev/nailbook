@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { EstadoCita, type CitaResponse } from "../../models/cita.model";
 import Card from "../ui/Card";
-import { AlarmClock, CalendarDays, Hourglass } from "lucide-react";
+import { AlarmClock, Banknote, CalendarDays, CircleCheck, CircleX, Hourglass } from "lucide-react";
 
 interface CitaCardProps {
     cita: CitaResponse;
@@ -32,22 +32,23 @@ const CitaCard = ({ cita, onEdit, onCancelar, onFinalizar }: CitaCardProps) => {
     const esProgramada = cita.estado === EstadoCita.Programada;
     const nombresServicios = cita.servicios.map(s => s.nombre).join(" • ");
     const horaFormateada = cita.horaInicio.substring(0, 5);
+    const valorTotal=cita.servicios.reduce((i,servicio)=>i+servicio.valor,0);
 
     const handleTouchStart = (e: React.TouchEvent) => {
     if (!esProgramada) return;
     startXRef.current = e.touches[0].clientX;
-    setIsDragging(true);  // ← setIsDragging
+    setIsDragging(true);  
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
-        if (!isDragging || startXRef.current === null) return;  // ← sin .current
+        if (!isDragging || startXRef.current === null) return;  
         const diff = e.touches[0].clientX - startXRef.current;
         if (diff < 0) setOffsetX(Math.max(diff, -80));
         if (diff > 0) setOffsetX(Math.min(diff, 80));
     };
 
     const handleTouchEnd = () => {
-        setIsDragging(false);  // ← setIsDragging
+        setIsDragging(false);  
         if (offsetX <= -60) setConfirmacion("cancelar");
         else if (offsetX >= 60) setConfirmacion("finalizar");
         setOffsetX(0);
@@ -123,19 +124,18 @@ const CitaCard = ({ cita, onEdit, onCancelar, onFinalizar }: CitaCardProps) => {
 
             {/* Card con swipe */}
             <div className="relative overflow-hidden rounded-2xl">
-                {/* Fondo izquierda — cancelar */}
-                {esProgramada && (
-                    <div className="absolute inset-0 flex items-center justify-end pr-5 rounded-2xl bg-gray-100">
-                        <span className="text-xs text-gray-400 font-medium">Cancelar ✕</span>
-                    </div>
-                )}
                 {/* Fondo derecha — finalizar */}
                 {esProgramada && (
-                    <div className="absolute inset-0 flex items-center justify-start pl-5 rounded-2xl bg-emerald-50">
-                        <span className="text-xs text-emerald-500 font-medium">✓ Finalizar</span>
+                    <div className="absolute inset-y-0 left-0 w-1/2 flex items-center justify-start pl-3 rounded-l-2xl bg-emerald-50">
+                        <span className="flex items-center text-xs text-emerald-500 font-medium"><CircleCheck size={15} className="-mt-[3px] text-emerald-500 mr-1"/> Finalizar</span>
                     </div>
                 )}
-
+                {/* Fondo izquierda — cancelar */}
+                {esProgramada && (
+                    <div className="absolute inset-y-0 right-0 w-1/2 flex items-center justify-end pr-2 rounded-r-2xl bg-red-400">
+                        <span className="flex items-center text-xs text-white font-medium">Cancelar <CircleX size={15} className="-mt-[3px] text-white ml-1"/></span>
+                    </div>
+                )}
                 {/* Card deslizable */}
                 <div
                     style={{ 
@@ -173,10 +173,11 @@ const CitaCard = ({ cita, onEdit, onCancelar, onFinalizar }: CitaCardProps) => {
                             </p>
 
                             {/* Fecha, hora y duración */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-wrap">
                                 <span className="flex items-center text-xs text-gray-400"><CalendarDays size={15} className="-mt-[3px] text-gray-500 mr-1"/> {formatearFecha(cita.fecha)}</span>
                                 <span className="flex items-center text-xs text-gray-400"><AlarmClock size={15} className="-mt-[3px] text-gray-500 mr-1"/> {horaFormateada}</span>
                                 <span className="flex items-center text-xs text-gray-400"><Hourglass size={15} className="-mt-[3px] text-gray-500 mr-1"/> {cita.duracion} min</span>
+                                <span className="flex items-center text-xs font-medium text-green-400"><Banknote size={15} className="-mt-[3px] text-green-500 mr-1"/>{valorTotal.toLocaleString("es-CO")}</span>
                             </div>
 
                             {/* Botones solo en Programada */}
