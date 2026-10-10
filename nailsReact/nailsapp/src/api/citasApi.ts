@@ -1,0 +1,63 @@
+import axios from "axios";
+import type { CitaFiltros, CitaResponse, CitaRequest } from "../models/cita.model";
+import type { PaginacionResponse } from "../models/cliente.model";
+import clienteAPI from "./clienteAxios";
+
+const URL = "/citas";
+
+const parsearError = (error: unknown): string => {
+    if (axios.isAxiosError(error)) {
+        const data = error.response?.data;
+        if (Array.isArray(data)) return data.join(", ");
+        if (typeof data === "string") return data;
+    }
+    return "Algo salió mal, intenta de nuevo";
+};
+
+export const getCitas = async (filtros: CitaFiltros): Promise<PaginacionResponse<CitaResponse>> => {
+    const params = new URLSearchParams();
+    params.append("pagina", filtros.pagina.toString());
+    params.append("recordsPorPagina", filtros.recordsPorPagina.toString());
+    if (filtros.estado !== undefined)
+        params.append("estado", filtros.estado.toString());
+    if (filtros.fecha !== undefined)
+        params.append("fecha", filtros.fecha); 
+    const response = await clienteAPI.get<PaginacionResponse<CitaResponse>>(
+        `${URL}?${params.toString()}`
+    );
+    return response.data;
+};
+
+export const getCitaById = async (id: number): Promise<CitaResponse> => {
+    const response = await clienteAPI.get<CitaResponse>(`${URL}/${id}`);
+    return response.data;
+};
+
+export const createCita = async (data: CitaRequest): Promise<CitaResponse> => {
+    try {
+        const response = await clienteAPI.post<CitaResponse>(URL, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(parsearError(error));
+    }
+};
+
+export const updateCita = async (id: number, data: CitaRequest): Promise<CitaResponse> => {
+    try {
+        const response = await clienteAPI.put<CitaResponse>(`${URL}/${id}`, data);
+        return response.data;
+    } catch (error) {
+        throw new Error(parsearError(error));
+    }
+};
+
+export const cambiarEstadoCita = async (id: number, estado: number): Promise<CitaResponse> => {
+    try {
+        const response = await clienteAPI.patch<CitaResponse>(
+            `${URL}/${id}/estado?estado=${estado}`
+        );
+        return response.data;
+    } catch (error) {
+        throw new Error(parsearError(error));
+    }
+};
